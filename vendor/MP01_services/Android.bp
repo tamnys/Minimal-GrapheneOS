@@ -1,0 +1,6 @@
+subdirs = [
+    "MP01_accessibility_service",
+    "MP01_eink_daemon",
+    "mp_keyboard",
+    "sepolicy",
+]

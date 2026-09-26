@@ -1,0 +1,29 @@
+type mp01_eink_server, domain, coredomain;
+type mp01_eink_server_exec, exec_type, system_file_type, file_type;
+
+init_daemon_domain(mp01_eink_server)
+
+# init creates /dev/socket/MP01_eink_socket. system_app has path and connect
+# permission, and SO_PEERCRED limits accepted clients to the system UID.
+allow mp01_eink_server self:unix_stream_socket create_stream_socket_perms;
+allow init mp01_eink_server:unix_stream_socket listen;
+allow system_app mp01_eink_socket:sock_file write;
+allow system_app mp01_eink_server:unix_stream_socket connectto;
+
+# Parent directory traversal only. Read/write access is limited to the exact
+# MP01 nodes labeled in genfs_contexts.
+allow mp01_eink_server sysfs_leds:dir search;
+allow mp01_eink_server sysfs_leds:lnk_file read;
+allow mp01_eink_server mp01_eink_sysfs:lnk_file read;
+allow mp01_eink_server mp01_eink_sysfs:file { open write };
+
+set_prop(mp01_eink_server, mp01_eink_control_prop)
+
+# Android's debugfs restriction permits init mediation only on debug builds.
+# The MP01 GSI is a userdebug target; user builds intentionally get no grant.
+userdebug_or_eng(`
+allow init mp01_eink_debugfs:file { open write };
+')
+
+# init applies the boot-time frontlight clamp from the service rc file.
+allow init mp01_eink_sysfs:file { open write };

@@ -1,0 +1,2 @@
+/system/bin/MP01_eink_server u:object_r:mp01_eink_server_exec:s0
+/dev/socket/MP01_eink_socket u:object_r:mp01_eink_socket:s0

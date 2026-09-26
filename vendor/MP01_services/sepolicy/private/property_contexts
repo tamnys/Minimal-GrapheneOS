@@ -1,0 +1,3 @@
+sys.mp01.eink.clean_a2      u:object_r:mp01_eink_control_prop:s0 exact uint
+sys.mp01.eink.anti_flicker  u:object_r:mp01_eink_control_prop:s0 exact uint
+sys.linevibrator_touch      u:object_r:mp01_framework_prop:s0 exact uint

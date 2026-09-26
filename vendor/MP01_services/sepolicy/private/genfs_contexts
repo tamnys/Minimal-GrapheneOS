@@ -1,0 +1,19 @@
+# Frontlight controls exposed through /sys/class/leds.
+genfscon sysfs /class/leds/lcd-backlight/brightness      u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /class/leds/led-warmlight/brightness     u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /class/leds/keyboard-backlight/brightness u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:mtk_leds/leds/lcd-backlight/brightness u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:mtk_leds/leds/led-warmlight/brightness u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:mtk_leds/leds/keyboard-backlight/brightness u:object_r:mp01_eink_sysfs:s0
+
+# MP01 e-ink controller and display controls.
+genfscon sysfs /devices/platform/soc/11f00000.i2c/i2c-7/7-004b/eink_cpld_registers u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/epd_commit_bitmap u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/epd_white_threshold u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/epd_black_threshold u:object_r:mp01_eink_sysfs:s0
+genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/epd_contrast u:object_r:mp01_eink_sysfs:s0
+
+# init mediates these legacy controls on the userdebug GSI; the daemon has no
+# direct debugfs permission.
+genfscon debugfs /eink_debug/clean_a2      u:object_r:mp01_eink_debugfs:s0
+genfscon debugfs /eink_debug/anti_flicker u:object_r:mp01_eink_debugfs:s0

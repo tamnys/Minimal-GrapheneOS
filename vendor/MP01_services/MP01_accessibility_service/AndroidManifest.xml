@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lmqr.hMP01_comp_service"
+    android:sharedUserId="android.uid.system">
+
+    <permission
+        android:name="com.lmqr.hMP01_comp_service.permission.CONTROL_EINK_REFRESH"
+        android:label="@string/permission_control_eink_refresh_label"
+        android:description="@string/permission_control_eink_refresh_description"
+        android:protectionLevel="dangerous" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.HMP01_comp_service"
+        android:directBootAware="true"
+        android:defaultToDeviceProtectedStorage="true"
+        android:persistent="true">
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true"
+            android:label="@string/title_activity_settings" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".MP01AccessibilityService"
+            android:exported="true"
+            android:label="MP01 Accessibility Service"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <service
+            android:name=".quick_settings.LaunchSettingsTile"
+            android:exported="true"
+            android:label="E-Ink settings"
+            android:icon="@drawable/baseline_settings_24"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".quick_settings.ClearScreenTile"
+            android:exported="true"
+            android:label="Clear Screen"
+            android:icon="@drawable/baseline_photo_filter_24"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Apply first-setup defaults, then preserve the user's service choice. -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".automation.EinkAutomationReceiver"
+            android:directBootAware="true"
+            android:exported="true"
+            android:permission="com.lmqr.hMP01_comp_service.permission.CONTROL_EINK_REFRESH">
+            <intent-filter>
+                <action android:name="com.lmqr.hMP01_comp_service.action.EINK_FORCE_CLEAR" />
+                <action android:name="com.lmqr.hMP01_comp_service.action.EINK_SET_REFRESH_MODE" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

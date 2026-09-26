@@ -1,0 +1,2 @@
+# MP01AccessibilityService is platform-signed and runs as android.uid.system.
+set_prop(system_app, mp01_framework_prop)
