@@ -3,6 +3,14 @@
 `audit-signers.py --help` exposes three profiles independently of the preserved
 LineageOS signer gate. It reuses the existing immutable target-files snapshot,
 APK signature verifier and APEX inspection implementation.
+Run it through the pinned builder with networking disabled, for example
+`bash grapheneos/container.sh audit-signers --help`. A candidate invocation
+must supply the signed target-files, the independently authenticated public
+policy SHA256, a trusted vendor-baseline SHA256, otatools, the direct Java and
+apksigner JAR paths with their pinned SHA256 values, and a new output path.
+For an upgrade, also supply the independently authenticated previous report
+and its SHA256. The builder wrapper does not supply any trust anchor or private
+release key.
 
 | Profile | Meaning |
 | --- | --- |
@@ -77,3 +85,50 @@ test certificates are rejected for candidates. The policy's hash and previous
 report's hash must arrive through authenticated release metadata, independently
 of the candidate bundle; computing a hash from an untrusted adjacent file does
 not establish trust. No project release policy or private key is created here.
+
+## Release bundle integrity binding
+
+`audit-bundle.py` is a separate, host-side integrity gate. It needs only Python
+standard-library modules and may run before the MP01 is connected. Arrange a
+candidate directory with `bundle-manifest.json` and the files named in that
+manifest. Obtain the manifest's SHA256 through authenticated release metadata
+**outside** that directory; calculating the expected hash from the candidate
+directory itself does not authenticate it. The trusted manifest then pins each
+artifact's exact SHA256. Use a new report path:
+
+```bash
+python3 grapheneos/audit-bundle.py \
+  --bundle-root /private/mp01-release-candidate \
+  --manifest-sha256 AUTHENTICATED_MANIFEST_SHA256 \
+  --output /private/mp01-reports/bundle-binding.json
+```
+
+The manifest schema is `mp01-bundle-binding-v1`, with exactly `schema`,
+`profile` (`initial-installation` or `upgrade`), and `artifacts`. Every artifact
+entry has exactly `path` and lowercase `sha256`. Paths are relative to the
+candidate directory, are ordinary files, and cannot traverse symlinks or `..`.
+The following artifact roles are required:
+
+| Role | Bound evidence |
+| --- | --- |
+| `signed_target_files`, `system_image` | Returned signed target-files and standalone `system.img`; the ZIP's `IMAGES/system.img` must hash identically to the standalone image |
+| `unsigned_target_files`, `build_provenance` | Original unsigned build output and the formal build result that hashes it |
+| `signer_report`, `avb_report` | Passing release-profile package signer report and signed-system AVB report; both must name the same signed image and set `flash_authorized: false` |
+| `source_receipt`, `source_lock`, `prepared_manifest` | Preparation receipt, locked `grapheneos/inputs.json`, and the receipt's prepared `.xml` file |
+| `signing_policy`, `vendor_baseline` | Public policy and vendor-baseline document named by the signer report's digests |
+
+For `upgrade`, add `previous_signer_report`; the current signer report must
+name its SHA256. The gate also checks the MP01 `user` build identity, the source
+receipt and build provenance link, and the build timestamp across provenance
+and signed target-files. Duplicate JSON keys, unexpected manifest fields,
+artifact substitution, path traversal and inconsistent cross-report hashes
+fail closed. The report records all verified hashes and always sets
+`flash_authorized: false`.
+
+This is **integrity and evidence binding only**. An authenticated manifest
+binds bytes but does not independently prove that the signer or AVB tools ran,
+validate the full AVB chain, attest the source or signing environment, inspect
+the complete image filesystem, prove vendor compatibility, or confirm that an
+image matches the installed MP01. Keep the original signer and AVB reports,
+independent trust material and device results. A complete release audit and
+device-specific installation approval are still required before flashing.
