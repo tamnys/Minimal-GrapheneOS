@@ -32,8 +32,25 @@ COMMANDS = {
     'kernel-config': ['exec-out', 'cat', '/proc/config.gz'],
     'cpu': ['shell', 'cat /proc/cpuinfo'],
     'partitions': ['shell', 'cat /proc/partitions; ls -l /dev/block/by-name /dev/block/bootdevice/by-name'],
+    # lpdump is read-only. An absent or denied tool is retained as a gap in the
+    # report, not treated as evidence that dynamic partitions are unsupported.
+    'dynamic-partitions': ['shell', 'lpdump'],
     'mounts': ['shell', 'cat /proc/mounts; cat /vendor/etc/fstab* /odm/etc/fstab*'],
     'vintf': ['shell', 'ls -l /vendor/etc/vintf /odm/etc/vintf; cat /vendor/etc/vintf/manifest.xml /vendor/etc/vintf/compatibility_matrix.xml'],
+    # HAL declarations may be split into fragment XMLs below these directories.
+    # Only fixed globs are expanded on the phone; discovered paths are quoted
+    # as data and never interpolated into new shell commands.
+    'vintf-fragments': ['shell',
+                        'found=0; failed=0; '
+                        'for dir in /vendor/etc/vintf /odm/etc/vintf; do '
+                        '[ -d "$dir" ] || { printf "MISSING VINTF DIRECTORY: %s\\n" "$dir" >&2; '
+                        'failed=1; continue; }; '
+                        'for f in "$dir"/*/*.xml; do '
+                        '[ -f "$f" ] || continue; found=1; '
+                        'printf "\\n===== %s =====\\n" "$f"; '
+                        'cat "$f" || failed=1; done; done; '
+                        '[ "$found" -eq 1 ] || printf "NO VINTF FRAGMENT XML FOUND\\n" >&2; '
+                        '[ "$failed" -eq 0 ]'],
     'hal-services': ['shell', 'lshal'],
     'binder-services': ['shell', 'service list'],
     'selinux': ['shell', 'getenforce; cat /sys/fs/selinux/enforce; id'],
