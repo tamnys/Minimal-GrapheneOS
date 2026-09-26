@@ -62,7 +62,9 @@ class MP01AccessibilityService : AccessibilityService(),
                     menuBinding.close()
                     if (sharedPreferences.getBoolean("refresh_on_lock", true))
                         handler.postDelayed({
-                            commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))
+                            if (!commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))) {
+                                Log.e(TAG, "Failed to clear e-ink screen on lock")
+                            }
                         }, 50)
                     brightnessManager.turnOffBrightness()
                 }
@@ -288,17 +290,19 @@ class MP01AccessibilityService : AccessibilityService(),
         Log.d(TAG, "Service connected - applying all settings")
 
         handler.postDelayed({
-            refreshModeManager.applyMode()
-            Log.d(TAG, "Applied refresh mode: ${refreshModeManager.currentMode}")
+            if (refreshModeManager.applyMode()) {
+                Log.d(TAG, "Applied refresh mode: ${refreshModeManager.currentMode}")
+            }
 
             handler.postDelayed({
-                brightnessManager.applyBrightness()
-                Log.d(TAG, "Applied brightness: cold=${brightnessManager.coldBrightness}, warm=${brightnessManager.warmBrightness}")
+                if (brightnessManager.applyBrightness()) {
+                    Log.d(TAG, "Applied brightness: cold=${brightnessManager.coldBrightness}, warm=${brightnessManager.warmBrightness}")
+                }
 
                 handler.postDelayed({
                     updateColorScheme(sharedPreferences)
                     updateMaxBrightness(sharedPreferences)
-                    Log.d(TAG, "Applied remaining settings")
+                    Log.d(TAG, "Processed remaining settings")
                 }, 500)
             }, 500)
         }, 1000)
@@ -377,7 +381,9 @@ class MP01AccessibilityService : AccessibilityService(),
             "run_clear_screen" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
                 handler.postDelayed({
-                    commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))
+                    if (!commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))) {
+                        Log.e(TAG, "Failed to clear e-ink screen from settings")
+                    }
                 }, 700)
             }
         }
