@@ -1,0 +1,46 @@
+From 102c5e237e5081c9f81223c514d459a1fc65ac56 Mon Sep 17 00:00:00 2001
+From: MP01 source preparation <mp01-build@localhost>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH] Choose inkOS as completed MP01 setup home fallback
+
+---
+ .../controller/behavior/HomeRoleBehavior.java | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/PermissionController/role-controller/java/com/android/role/controller/behavior/HomeRoleBehavior.java b/PermissionController/role-controller/java/com/android/role/controller/behavior/HomeRoleBehavior.java
+index e62db28..46d0e27 100644
+--- a/PermissionController/role-controller/java/com/android/role/controller/behavior/HomeRoleBehavior.java
++++ b/PermissionController/role-controller/java/com/android/role/controller/behavior/HomeRoleBehavior.java
+@@ -22,6 +22,7 @@ import android.content.pm.ApplicationInfo;
+ import android.content.pm.PackageManager;
+ import android.content.pm.ResolveInfo;
+ import android.os.Build;
++import android.os.SystemProperties;
+ import android.os.UserHandle;
+ import android.provider.Settings;
+
+@@ -89,6 +90,24 @@ public class HomeRoleBehavior implements RoleBehavior {
+                 PackageManager.MATCH_DEFAULT_ONLY | PackageManager.MATCH_DIRECT_BOOT_AWARE
+                 | PackageManager.MATCH_DIRECT_BOOT_UNAWARE);
+
++        // The MP01's system image includes inkOS, but the setup wizard must remain home until
++        // it finishes. Choose inkOS only as a fallback; an existing user-selected holder is
++        // retained by RoleControllerServiceImpl and never reaches this method.
++        if ("mp01".equals(SystemProperties.get("ro.product.system.device"))
++                && Settings.Secure.getInt(userContext.getContentResolver(),
++                        Settings.Secure.USER_SETUP_COMPLETE, 0) == 1) {
++            for (ResolveInfo resolveInfo : resolveInfos) {
++                if (resolveInfo.activityInfo != null
++                        && "app.inkos".equals(resolveInfo.activityInfo.packageName)
++                        && "com.github.gezimos.inkos.MainActivity".equals(
++                                resolveInfo.activityInfo.name)
++                        && (resolveInfo.activityInfo.applicationInfo.flags
++                                & ApplicationInfo.FLAG_SYSTEM) != 0) {
++                    return "app.inkos";
++                }
++            }
++        }
++
+         String packageName = null;
+         int priority = Integer.MIN_VALUE;
+         int resolveInfosSize = resolveInfos.size();
