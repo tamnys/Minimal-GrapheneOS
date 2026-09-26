@@ -1,0 +1,22 @@
+From 64a4cfed7e0537af1b981717e4f0d5bf3210aea3 Mon Sep 17 00:00:00 2001
+From: MP01 source preparation <mp01-build@localhost>
+Date: Mon, 21 Sep 2026 00:00:00 +0000
+Subject: [PATCH] Exclude unsupported Auditor attestation from the MP01 product
+
+---
+ target/product/handheld_product.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/product/handheld_product.mk b/target/product/handheld_product.mk
+index 2a4602d..13f0836 100644
+--- a/target/product/handheld_product.mk
++++ b/target/product/handheld_product.mk
+@@ -23,7 +23,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/media_product.mk)
+ # /product packages
+ PRODUCT_PACKAGES += \
+     AppStore \
+-    Auditor \
++    $(if $(filter mp01,$(TARGET_PRODUCT)),,Auditor) \
+     Calendar \
+     Camera \
+     Contacts \

@@ -1,0 +1,19 @@
+# Fedora remains the host. This image is the Debian 12 build environment.
+FROM docker.io/library/debian@sha256:f3034a6ec3c1205360777c4aae76234998866ad18806ae62b63a3f84ccad782b
+ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
+RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources \
+ && printf '%s\n' \
+    'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20260919T000000Z bookworm main contrib' \
+    'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260919T000000Z bookworm-security main' \
+    > /etc/apt/sources.list \
+ && apt-get update \
+ && apt-get install --no-install-recommends -y \
+    ca-certificates git git-lfs repo python3 gnupg openssh-client openssl \
+    rsync zip unzip xz-utils file diffutils hostname fonts-dejavu-core \
+    lz4 zstd bison flex build-essential bc gperf curl libncurses-dev libssl-dev \
+    libxml2-utils xsltproc fontconfig ccache locales openjdk-17-jdk-headless \
+ && mkdir -p /opt/mp01 \
+ && dpkg-query -W -f='${Package}\t${Version}\n' > /opt/mp01/dependencies.tsv \
+ && printf '%s\n' 'mp01-debian12-v1' > /opt/mp01/builder \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace/Minimal-GrapheneOS

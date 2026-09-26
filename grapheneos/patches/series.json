@@ -1,0 +1,18 @@
+[
+  {
+    "project": "build/make",
+    "file": "0001-mp01-exclude-unsupported-attestation.patch",
+    "sha256": "a6bea319cb05dad21c5a1ad61550b0e24257e5cbed8574884e196630154d6406",
+    "base_revision": "b0f697df8cc9519408ca0a404e918cd51bde0735",
+    "result_revision": "64a4cfed7e0537af1b981717e4f0d5bf3210aea3",
+    "reason": "Auditor requires supported attestation hardware; preserve all other GrapheneOS apps and all non-MP01 product definitions."
+  },
+  {
+    "project": "packages/modules/Permission",
+    "file": "0002-mp01-default-inkos-home.patch",
+    "sha256": "00dae56e928236a3e56202c1eb313f65f13ed45e64a24e64daba3bf0cd39c9fa",
+    "base_revision": "4d6005dbabf3f2bf96e5215c5c2801809b051bf3",
+    "result_revision": "102c5e237e5081c9f81223c514d459a1fc65ac56",
+    "reason": "After per-user setup completes on the MP01 system product, prefer the exact preinstalled inkOS HOME activity only when the role needs a fallback; leave other devices and existing user selections unchanged."
+  }
+]
