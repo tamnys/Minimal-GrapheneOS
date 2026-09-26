@@ -1,0 +1,3 @@
+type mp01_eink_sysfs, fs_type, sysfs_type;
+type mp01_eink_debugfs, fs_type, debugfs_type;
+type mp01_eink_socket, file_type, coredomain_socket;

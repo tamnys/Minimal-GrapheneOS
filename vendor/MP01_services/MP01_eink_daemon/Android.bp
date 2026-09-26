@@ -1,0 +1,19 @@
+cc_binary {
+    name: "MP01_eink_server",
+    srcs: [
+        "command_stream.c",
+        "command_dispatch.c",
+        "eink_daemon.c",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fPIE",
+    ],
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    init_rc: ["etc/init/MP01_eink_daemon.rc"],
+}

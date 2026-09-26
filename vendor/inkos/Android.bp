@@ -1,0 +1,6 @@
+android_app_import {
+    name: "inkos",
+    apk: "inkos_v0.1.apk",
+    presigned: true,
+    preprocessed: true,
+}

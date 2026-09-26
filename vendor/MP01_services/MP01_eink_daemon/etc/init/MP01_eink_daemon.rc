@@ -1,0 +1,21 @@
+# MP01_eink_daemon/etc/init/MP01_eink_daemon.rc
+
+service MP01_eink_server /system/bin/MP01_eink_server
+    disabled
+    socket MP01_eink_socket stream+listen 0600 system system
+
+on boot
+    write /sys/class/leds/lcd-backlight/brightness 0
+    write /sys/class/leds/led-warmlight/brightness 0
+    write /sys/class/leds/keyboard-backlight/brightness 0
+
+on property:sys.boot_completed=1
+    start MP01_eink_server
+
+# Android forbids application and daemon access to debugfs on modern launch
+# configurations. init mediates these two validated, MP01-specific controls.
+on property:sys.mp01.eink.clean_a2=*
+    write /sys/kernel/debug/eink_debug/clean_a2 ${sys.mp01.eink.clean_a2}
+
+on property:sys.mp01.eink.anti_flicker=*
+    write /sys/kernel/debug/eink_debug/anti_flicker ${sys.mp01.eink.anti_flicker}

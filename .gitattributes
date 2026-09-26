@@ -1,0 +1,2 @@
+# Preserve the byte-exact, SHA256-pinned upstream release manifest.
+grapheneos/upstream-manifest.xml -whitespace
