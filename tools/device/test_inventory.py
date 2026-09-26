@@ -69,6 +69,34 @@ class DeviceInventoryTests(unittest.TestCase):
             self.assertTrue(all(call.args[2][0] in {'shell', 'exec-out'}
                                 for call in run.call_args_list))
 
+    def test_optional_partition_and_vintf_failures_remain_evidence(self):
+        def read_only_result(adb, serial, arguments):
+            if arguments[:2] == ['shell', 'getprop']:
+                value = 'MP01' if arguments[2] == 'ro.product.vendor.model' else 'observed'
+                return subprocess.CompletedProcess([], 0, (value + '\n').encode(), b'')
+            if arguments == INVENTORY.COMMANDS['dynamic-partitions']:
+                return subprocess.CompletedProcess([], 127, b'', b'lpdump: not found\n')
+            if arguments == INVENTORY.COMMANDS['vintf-fragments']:
+                return subprocess.CompletedProcess([], 1, b'', b'MISSING VINTF DIRECTORY: /odm/etc/vintf\n')
+            return subprocess.CompletedProcess([], 0, b'observed\n', b'')
+
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(INVENTORY, 'run', side_effect=read_only_result):
+            report = json.loads(INVENTORY.collect(Path('/adb'), 'selected-serial',
+                                                  Path(tmp) / 'capture').read_text())
+            for name, expected_code, expected_error in [
+                ('dynamic-partitions', 127, b'lpdump: not found\n'),
+                ('vintf-fragments', 1, b'MISSING VINTF DIRECTORY: /odm/etc/vintf\n'),
+            ]:
+                observation = report['observations'][name]
+                self.assertEqual(observation['exit_code'], expected_code)
+                self.assertEqual((Path(tmp) / 'capture' / observation['stderr']['file']).read_bytes(),
+                                 expected_error)
+            self.assertEqual(INVENTORY.COMMANDS['dynamic-partitions'], ['shell', 'lpdump'])
+            fragment_command = INVENTORY.COMMANDS['vintf-fragments'][1]
+            self.assertIn('===== %s =====', fragment_command)
+            self.assertIn('cat "$f"', fragment_command)
+
 
 if __name__ == '__main__':
     unittest.main()

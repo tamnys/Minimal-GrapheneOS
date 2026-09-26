@@ -1,6 +1,7 @@
 package com.lmqr.hMP01_comp_service
 
 import android.content.SharedPreferences
+import android.util.Log
 import android.widget.SeekBar
 import com.lmqr.hMP01_comp_service.command_runners.CommandRunner
 
@@ -9,7 +10,8 @@ import com.lmqr.hMP01_comp_service.command_runners.CommandRunner
  */
 class BrightnessManager(
     private val sharedPreferences: SharedPreferences,
-    private val commandRunner: CommandRunner
+    private val commandRunner: CommandRunner,
+    private val reportFailure: (String) -> Unit = { Log.e("MP01Brightness", it) }
 ) {
     companion object {
         private const val PREF_COLD_BRIGHTNESS = "cold_brightness_value"
@@ -36,25 +38,33 @@ class BrightnessManager(
     /**
      * Apply current brightness settings to the device
      */
-    fun applyBrightness() {
-        commandRunner.runCommands(arrayOf("br_co${coldBrightness}", "br_wm${warmBrightness}", "br_kb${keyboardBrightness}"))
-    }
+    fun applyBrightness(): Boolean = runHardwareCommands(
+        arrayOf("br_co${coldBrightness}", "br_wm${warmBrightness}", "br_kb${keyboardBrightness}"),
+        "apply saved brightness"
+    )
 
     /**
      * Update both brightness values and apply them
      */
-    fun setBrightness(coldValue: Int, warmValue: Int, keyboardValue: Int) {
+    fun setBrightness(coldValue: Int, warmValue: Int, keyboardValue: Int): Boolean {
         coldBrightness = coldValue
         warmBrightness = warmValue
         keyboardBrightness = keyboardValue
-        applyBrightness()
+        return applyBrightness()
     }
 
     /**
      * Turn off both backlights
      */
-    fun turnOffBrightness() {
-        commandRunner.runCommands(arrayOf("br_co0", "br_wm0", "br_kb0"))
+    fun turnOffBrightness(): Boolean = runHardwareCommands(
+        arrayOf("br_co0", "br_wm0", "br_kb0"),
+        "turn off backlights"
+    )
+
+    private fun runHardwareCommands(commands: Array<String>, operation: String): Boolean {
+        val applied = commandRunner.runCommands(commands)
+        if (!applied) reportFailure("Failed to $operation")
+        return applied
     }
 
     /**
@@ -68,7 +78,7 @@ class BrightnessManager(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     if (fromUser) {
-                        commandRunner.runCommands(arrayOf("br_co$progress"))
+                        runHardwareCommands(arrayOf("br_co$progress"), "set cold frontlight")
                     }
                 }
 
@@ -87,7 +97,7 @@ class BrightnessManager(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     if (fromUser) {
-                        commandRunner.runCommands(arrayOf("br_wm$progress"))
+                        runHardwareCommands(arrayOf("br_wm$progress"), "set warm frontlight")
                     }
                 }
 
@@ -105,7 +115,7 @@ class BrightnessManager(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     if (fromUser) {
-                        commandRunner.runCommands(arrayOf("br_kb$progress"))
+                        runHardwareCommands(arrayOf("br_kb$progress"), "set keyboard backlight")
                     }
                 }
 

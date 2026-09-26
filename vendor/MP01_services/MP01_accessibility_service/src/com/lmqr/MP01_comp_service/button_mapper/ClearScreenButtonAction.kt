@@ -1,6 +1,7 @@
 package com.lmqr.hMP01_comp_service.button_mapper
 
 import android.content.Context
+import android.util.Log
 import com.lmqr.hMP01_comp_service.command_runners.CommandRunner
 import com.lmqr.hMP01_comp_service.command_runners.Commands
 import com.lmqr.hMP01_comp_service.RefreshModeManager
@@ -20,6 +21,8 @@ import android.graphics.PorterDuff.Mode
 
 class ClearScreenButtonAction(private val commandRunner: CommandRunner, private val refreshModeManager: RefreshModeManager) : ButtonAction {
     override fun execute(context: Context) {
-        commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))
+        if (!commandRunner.runCommands(arrayOf(Commands.FORCE_CLEAR))) {
+            Log.e("MP01ClearScreen", "Failed to clear e-ink screen from refresh button")
+        }
     }
 }
