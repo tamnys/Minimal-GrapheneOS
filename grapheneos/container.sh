@@ -21,14 +21,16 @@ if [[ "$action" == build-image && $# == 0 ]]; then
 fi
 case "$action" in
     sync|fetch-prebuilts) network=slirp4netns ;;
-    preflight|prepare|verify-source|build|audit-avb) network=none ;;
-    *) printf '%s\n' 'Usage: grapheneos/container.sh build-image|preflight|fetch-prebuilts|sync|prepare|verify-source|build|audit-avb [arguments]' >&2; exit 2 ;;
+    preflight|prepare|verify-source|build|audit-signers|audit-avb) network=none ;;
+    *) printf '%s\n' 'Usage: grapheneos/container.sh build-image|preflight|fetch-prebuilts|sync|prepare|verify-source|build|audit-signers|audit-avb [arguments]' >&2; exit 2 ;;
 esac
 image_id="$(cat "$state/builder-image-id")"
 [[ "$image_id" =~ ^(sha256:)?[a-f0-9]{64}$ ]] || { printf '%s\n' 'Invalid builder image ID' >&2; exit 2; }
 runner=(python3 grapheneos/build.py "$action")
 if [[ "$action" == audit-avb ]]; then
     runner=(python3 grapheneos/audit-avb.py)
+elif [[ "$action" == audit-signers ]]; then
+    runner=(python3 grapheneos/audit-signers.py)
 fi
 exec "${podman_cmd[@]}" run --rm --pull=never --network="$network" \
     --workdir "/workspace/$(basename -- "$repo_root")" \
