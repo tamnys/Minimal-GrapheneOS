@@ -56,7 +56,7 @@ establish an observable result before these controls can pass acceptance.
 
 ## Builder
 
-Fedora can remain the host. Install **rootless Podman** using the normal qube
+Fedora hosts are supported. Install **rootless Podman** using the normal qube
 administration path. Run from the registered `Minimal-GrapheneOS` checkout:
 
 ```bash
@@ -74,8 +74,8 @@ check is disabled for the historical snapshots, while package signature checks
 remain enabled. Debian's `repo` launcher comes from the snapshot's `contrib`
 component; the full repo implementation is pinned separately to an exact Git
 commit and verified after initialization. The exact installed package inventory
-is retained in the image. The pinned image built successfully on this qube,
-and its source-sync preflight passed. A full Android build remains untested.
+is retained in the image. Verify the builder and source-sync preflight in the
+selected environment before preparing a full Android build.
 
 Podman storage, source, caches, home, temporary data and logs are project-local.
 Only the project workspace is mounted; host credential directories and private
