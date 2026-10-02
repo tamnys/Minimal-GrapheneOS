@@ -1,4 +1,4 @@
-# Fedora remains the host. This image is the Debian 12 build environment.
+# Pinned Debian 12 Android build environment; Fedora hosts are supported.
 FROM docker.io/library/debian@sha256:f3034a6ec3c1205360777c4aae76234998866ad18806ae62b63a3f84ccad782b
 ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
 RUN rm -f /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources \

@@ -48,16 +48,13 @@ operation.
 
 | App | MP01 production result | Handoff mechanism to verify |
 | --- | --- | --- |
-| Signal | NOT RUN | Pixel primary, MP01 linked phone; history/media and companion limitations; independent recovery backup |
-| WhatsApp | NOT RUN | Pixel primary, MP01 companion; historical media, inactivity and primary-device requirements |
+| Signal | NOT RUN | Reference phone primary, MP01 linked phone; history/media and companion limitations; independent recovery backup |
+| WhatsApp | NOT RUN | Reference phone primary, MP01 companion; historical media, inactivity and primary-device requirements |
 | WeChat | NOT RUN | Native migration in both directions; messages, attachments, authentication and repeated transfers |
 | Telegram | NOT RUN | Cloud synchronization and sessions; explicitly inventory nonportable Secret Chats/local-only state |
 | Messenger | NOT RUN | Secure Storage access/recovery and history on both phones |
 | SMS/MMS | NOT RUN | Provider export/import both ways; deduplication, new messages, attachments and subscription handling; RCS outside initial scope |
-| Found | NOT RUN | Independent MP01 enrollment/access; use Pixel if unsupported |
-| PayPal | NOT RUN | Independent MP01 enrollment/access; use Pixel if unsupported |
-| Robinhood | NOT RUN | Independent MP01 enrollment/access; use Pixel if unsupported |
-| Venmo | NOT RUN | Independent MP01 enrollment/access; use Pixel if unsupported |
+| Financial apps | NOT RUN | Test each selected app's MP01 enrollment/access independently; document unsupported devices and account recovery |
 
 Do not transfer hardware-bound credentials by copying app directories. Keep
 financial enrollment and account recovery separate from message migration.
@@ -67,8 +64,9 @@ verified during testing; the table is a test plan, not a portability claim.
 
 ## Recurring handoff procedure to measure
 
-The target is **15–30 minutes after the initial archive transfer**. Keep the
-Pixel as the initial Signal/WhatsApp primary. A custom migration application
+Use a separate reference phone for migration testing. The target is
+**15–30 minutes after the initial archive transfer**. Keep the reference phone
+as the initial Signal/WhatsApp primary. A custom migration application
 and automatic OS OTA are deferred.
 
 1. Unlock both phones, check their backup/recovery state, and record the start
@@ -85,7 +83,7 @@ and automatic OS OTA are deferred.
    primary/linked roles need not follow the physical SIM automatically.
 5. Verify passwords/authentication using supported app mechanisms and the
    separately enrolled financial apps. Keep unsupported financial apps on the
-   Pixel with working independent account recovery.
+   reference phone with working independent account recovery.
 6. Record the end time, remaining gaps and both phones' backup status. Keep the
    standby primary accessible as required by the tested app versions.
 
@@ -94,7 +92,7 @@ transfers and repeat at least one SMS/MMS import to test deduplication. Include
 attachments and nonportable-history cases. Neither a one-way migration nor
 initial account login is sufficient evidence.
 
-| Trial | Pixel → MP01 time/result | New MP01 messages verified | MP01 → Pixel time/result | New Pixel messages verified | Duplicate/attachment evidence |
+| Trial | Reference phone → MP01 time/result | New MP01 messages verified | MP01 → reference phone time/result | New reference-phone messages verified | Duplicate/attachment evidence |
 | --- | --- | --- | --- | --- | --- |
 | Round trip 1 | NOT RUN | NOT RUN | NOT RUN | NOT RUN | NOT RUN |
 | Round trip 2 | NOT RUN | NOT RUN | NOT RUN | NOT RUN | NOT RUN |
@@ -103,5 +101,5 @@ For the seven-day supervised trial, record each day's standby duration,
 battery start/end, calls/SMS expected/received, message notification delays,
 crashes and display issues. Mark the build ready only after production policy,
 recovery, data-preserving update and handoff gates pass. Track GrapheneOS stable
-rebases separately from vendor/kernel maintenance; the Pixel's official updates
-remain independent of the MP01 release schedule.
+rebases separately from vendor/kernel maintenance. Reference phones should
+follow their manufacturers' update schedules independently of MP01 releases.

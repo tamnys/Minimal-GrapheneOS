@@ -35,8 +35,8 @@ The production target is an encrypted, unrooted, SELinux-enforcing `user` build
 with working calls, messaging, networking, power management, and MP01 controls.
 Release acceptance requires testing on the actual device, including app privacy
 controls, carrier behavior, recovery, and a data-preserving update between two
-signed releases. The project also documents a practical handoff with a Pixel
-phone, leaving unsupported financial apps on the Pixel when necessary.
+signed releases. The project also documents app migration and phone handoff
+procedures, including compatibility limits and independent account recovery.
 
 The MP01's unlocked bootloader and existing vendor firmware limit the security
 claims this project can make. Device-specific compatibility and security results

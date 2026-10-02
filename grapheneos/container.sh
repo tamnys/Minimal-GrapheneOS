@@ -4,7 +4,7 @@ repo_root="$(cd -- "$(dirname -- "$0")/.." && pwd -P)"
 workspace="$(dirname -- "$repo_root")"
 state="$workspace/.android-build/grapheneos-17-state"
 command -v podman >/dev/null || {
-    printf '%s\n' 'Install rootless Podman through qube administration; Fedora can remain the host.' >&2
+    printf '%s\n' 'Install rootless Podman through qube administration; Fedora hosts are supported.' >&2
     exit 2
 }
 mkdir -p "$state/containers" "$state/run" "$state/home" "$state/tmp"

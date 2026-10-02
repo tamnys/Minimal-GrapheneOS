@@ -3,7 +3,7 @@
 The first GrapheneOS-derived MP01 build needs a fresh read-only inventory of
 the **actual MP01**. No phone has been inventoried for this product yet. Capture
 on the dedicated device-test qube when the phone is available; the development
-qube does not need USB access. Keep the Pixel detached or select the MP01 by
+qube does not need USB access. Disconnect other phones and select the MP01 by
 its explicit adb serial. The collector rejects a device whose vendor model is
 not `MP01`, including a Pixel. It never roots, reboots, flashes, erases, writes
 properties, or writes hardware nodes.
@@ -64,8 +64,8 @@ The build runner checks the report's schema, MP01 vendor identity, required
 ABI/vendor fields, and hashes of captured evidence. It does **not** establish
 that the vendor stack works with the new system. If those fields are absent,
 stop and investigate the device rather than editing the report to pass the
-gate. AT&T in the USA is the primary cellular target; T-Mobile in the USA is
-an additional target when service is available. Neither carrier passes until
+gate. Cellular compatibility targets include AT&T and T-Mobile in the USA.
+Test each carrier independently when service is available. Neither passes until
 on-device calls, messages, data, and sleep/IMS checks are run.
 
 An inventory is not permission to flash. Installation requires an independently
